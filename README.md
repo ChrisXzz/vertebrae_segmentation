@@ -43,14 +43,23 @@ The method is developed using the [VerSe20](https://verse2020.grand-challenge.or
 The challenge data structure you downloaded should be like
 
 > verse20_miccai_challenge
+>
 >       01_training
+>
 >               ...
+>
 >       02_validation (public testset)
+>
 >               GL017
+>
 >               GL045
+>
 >               ...
+>
 >       03_test (hidden testset)
+>
 >               ...
+>
 
 To process the testset, run
 
