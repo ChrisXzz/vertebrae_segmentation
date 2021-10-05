@@ -1,5 +1,3 @@
-# Untitled
-
 # Vertebrae segmentation
 
 This is an associated repository of the work 
@@ -9,6 +7,8 @@ This is an associated repository of the work
 Pre-print: [link]().
 
 It includes the proposed pipeline which is able to segment and label vertebrae from CT images of variant resolution, orientation and field of view. You could test the pipeline following the steps below.
+
+![visu](visu.png)
 
 ## Download the repository
 
@@ -46,17 +46,17 @@ The challenge data structure you downloaded should be like
 
 ```
 ../verse20_miccai_challenge
-		01_training
-				...
-		02_validation (public testset)
-				GL017
-						GL017_CT_ax.nii.gz
-						GL017_CT_ax_seg.nii.gz
-						GL017_CT_ax_iso-ctd.json
-						GL017_CT_ax.png
-				...
-		03_test (hidden testset)
-				...
+	01_training
+		...
+	02_validation (public testset)
+		GL017
+			GL017_CT_ax.nii.gz
+			GL017_CT_ax_seg.nii.gz
+			GL017_CT_ax_iso-ctd.json
+			GL017_CT_ax.png
+	   ...
+	03_test (hidden testset)
+		...
 ```
 
 To process the public or hidden testset, run
