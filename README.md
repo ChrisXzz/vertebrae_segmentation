@@ -1,18 +1,20 @@
-# Vertebrae_segmentation
+# Untitled
 
-This is an associated repository of the work **Vertebrae segmentation, identification and localization using a graph optimization and a synergistic sycle**.
+# Vertebrae segmentation
 
-Pre-print at [link]().
+This is an associated repository of the work 
 
-It includes the proposed pipeline which is able to segment and label vertebrae from CT images of varient resolution, orientation and field of view. You could test the pipeline following the steps below.  
+**Di Meng et al., Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.**
 
-![visu](visu.png)
+Pre-print: [link]().
+
+It includes the proposed pipeline which is able to segment and label vertebrae from CT images of variant resolution, orientation and field of view. You could test the pipeline following the steps below.
 
 ## Download the repository
 
-``
+```bash
 git clone https://gitlab.inria.fr/spine/vertebrae_segmentation.git
-``
+```
 
 ## Set up a virtual environment
 
@@ -20,19 +22,19 @@ Firstly install the [anaconda or miniconda](https://docs.anaconda.com/anaconda/i
 
 Once you have the conda installed, create a virtual environment using the env.yml file in the repo.
 
-``
+```bash
 conda env create -f env.yml
-``
+```
 
 The environment is named as verse20, you could change it in the env.yml.
 
 Then activate the environment by
 
-``
+```bash
 conda activate verse20
-``
+```
 
-Now you should hava all the dependencies that the pipeline needs.
+Now you should have all the dependencies that the pipeline needs.
 
 ## Get the data
 
@@ -42,30 +44,39 @@ The method is developed using the [VerSe20](https://verse2020.grand-challenge.or
 
 The challenge data structure you downloaded should be like
 
-> verse20_miccai_challenge
->
->       01_training
->
->               ...
->
->       02_validation (public testset)
->
->               GL017
->
->               GL045
->
->               ...
->
->       03_test (hidden testset)
->
->               ...
->
+```
+../verse20_miccai_challenge
+		01_training
+				...
+		02_validation (public testset)
+				GL017
+						GL017_CT_ax.nii.gz
+						GL017_CT_ax_seg.nii.gz
+						GL017_CT_ax_iso-ctd.json
+						GL017_CT_ax.png
+				...
+		03_test (hidden testset)
+				...
+```
 
-To process the testset, run
+To process the public or hidden testset, run
 
-``
-python test.py -D <path_to_folder>/02_validation
-``
+```bash
+python test.py -D <path to folder>/02_validation
+```
 
-You could specify the save folder by adding -S <path_to_folder>. Otherwise, the results would be saved directly in results/.
+The output for each input CT scan is a multi-label segmentation mask and a json file with labels and centroid coordinates.
 
+You could specify the save folder by 
+
+```bash
+python test.py -D <path to folder>/02_validation -S <path to save folde>
+```
+
+Otherwise, the results would be saved directly in a subfolder results/.
+
+To process one scan instead of the whole dataset, provide the scan ID, eg. GL017
+
+```bash
+python test.py -D <path to folder>/02_validation -V GL017
+```
