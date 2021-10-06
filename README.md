@@ -59,7 +59,7 @@ The challenge data structure you downloaded should be like
 To process the public or hidden testset, run
 
 ```bash
-python test.py -D <path to folder>/02_validation
+python test_verse.py -D <path to folder>/02_validation
 ```
 
 The output for each input CT scan is a multi-label segmentation mask and a json file with labels and centroid coordinates.
@@ -67,7 +67,7 @@ The output for each input CT scan is a multi-label segmentation mask and a json 
 You could specify the save folder by 
 
 ```bash
-python test.py -D <path to folder>/02_validation -S <path to save folder>
+python test_verse.py -D <path to folder>/02_validation -S <path to save folder>
 ```
 
 Otherwise, the results would be saved directly in a subfolder ``results/``.
@@ -75,5 +75,42 @@ Otherwise, the results would be saved directly in a subfolder ``results/``.
 To process one scan instead of the whole dataset, provide the scan ID, eg. GL017
 
 ```bash
-python test.py -D <path to folder>/02_validation -V GL017
+python test_verse.py -D <path to folder>/02_validation -V GL017
 ```
+
+## Run a demo
+
+If you feel too heavy to download the whole VerSe20 dataset, we prepare a sample for you to run a demo.
+
+```bash
+python test.py -D sample/verse815_CT-iso.nii.gz -S sample/
+```
+
+Then you can evaluate and visualize the result using ``evaluate.ipynb``
+
+## Run on other CT scans
+
+Currently only nifti file accepted, we will update the data I/O for more formats like dicoms. 
+
+```bash
+python test.py -D <path to your nifti file> -S <path to save folder>
+```
+
+## Contact
+
+For any questions, please contact [Di Meng](mailto:di.meng@inria.fr) or [Sergi Pujades](mailto:sergi.pujades-rocamora@inria.fr).
+
+## Citing 
+
+If you use the released models or code, please cite
+
+<ol>
+<li> **Meng D et al.,Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.** [link]()</li>
+<li> **Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.** [https://doi.org/10.1016/j.media.2021.102166](https://doi.org/10.1016/j.media.2021.102166)</li>
+</ol>
+
+## License
+
+The trained model is provided under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+The code is under the [MIT License](https://choosealicense.com/licenses/mit/).
