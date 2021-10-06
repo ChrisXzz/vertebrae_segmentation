@@ -2,7 +2,7 @@
 
 This is an associated repository of the work 
 
-**Di Meng et al., Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.**
+**Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.**
 
 Pre-print: [link]().
 
@@ -16,29 +16,26 @@ It includes the proposed pipeline which is able to segment and label vertebrae f
 git clone https://gitlab.inria.fr/spine/vertebrae_segmentation.git
 ```
 
-## Set up a virtual environment
+## Set up a python environment
 
-Firstly install the [anaconda or miniconda](https://docs.anaconda.com/anaconda/install/index.html).
-
-Once you have the conda installed, create a virtual environment using the env.yml file in the repo.
+If you use [anaconda or miniconda](https://docs.anaconda.com/anaconda/install/index.html), run the following to create and activate a virtual environment:
 
 ```bash
-conda env create -f env.yml
+conda env create -f environment.yml
+conda activate verse20
 ```
 
-The environment is named as verse20, you could change it in the env.yml.
-
-Then activate the environment by
+If you use pip installation, run
 
 ```bash
-conda activate verse20
+pip install -r requirements.txt
 ```
 
 Now you should have all the dependencies that the pipeline needs.
 
 ## Get the data
 
-The method is developed using the [VerSe20](https://verse2020.grand-challenge.org/) challenge public training set. The released models were trained using 80 scans of it. To test the pipeline on VerSe20 public and hidden testset, download the data from its [Github](https://github.com/anjany/verse). More details about the dataset can be found in the publication [Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.](https://doi.org/10.1016/j.media.2021.102166).
+The method is developed using the [VerSe20 challenge](https://verse2020.grand-challenge.org/) public training set. The released models were trained using 80 scans of it. To test the pipeline on VerSe20 public and hidden testset, download the data from its [Github](https://github.com/anjany/verse). More details about the dataset can be found in the publication [Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.](https://doi.org/10.1016/j.media.2021.102166)
 
 ## Run the pipeline on VerSe20 testset
 
@@ -70,10 +67,10 @@ The output for each input CT scan is a multi-label segmentation mask and a json 
 You could specify the save folder by 
 
 ```bash
-python test.py -D <path to folder>/02_validation -S <path to save folde>
+python test.py -D <path to folder>/02_validation -S <path to save folder>
 ```
 
-Otherwise, the results would be saved directly in a subfolder results/.
+Otherwise, the results would be saved directly in a subfolder ``results/``.
 
 To process one scan instead of the whole dataset, provide the scan ID, eg. GL017
 
