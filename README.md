@@ -44,16 +44,16 @@ The challenge data structure you downloaded should be like
 ```
 ../verse20_miccai_challenge
 	01_training
-		...
+	  ...
 	02_validation (public testset)
-		GL017
-			GL017_CT_ax.nii.gz
-			GL017_CT_ax_seg.nii.gz
-			GL017_CT_ax_iso-ctd.json
-			GL017_CT_ax.png
-	   ...
+	  GL017
+		GL017_CT_ax.nii.gz
+		GL017_CT_ax_seg.nii.gz
+		GL017_CT_ax_iso-ctd.json
+		GL017_CT_ax.png
+	  ...
 	03_test (hidden testset)
-		...
+	  ...
 ```
 
 To process the public or hidden testset, run
