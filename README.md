@@ -104,10 +104,9 @@ For any questions, please contact [Di Meng](mailto:di.meng@inria.fr) or [Sergi P
 
 If you use the released models or code, please cite
 
-<ol>
-<li> **Meng D et al.,Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.** [link]()</li>
-<li> **Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.** [https://doi.org/10.1016/j.media.2021.102166](https://doi.org/10.1016/j.media.2021.102166)</li>
-</ol>
+1. **Meng D et al.,Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.** [link]()
+2. **Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.** [https://doi.org/10.1016/j.media.2021.102166](https://doi.org/10.1016/j.media.2021.102166)
+
 
 ## License
 
