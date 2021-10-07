@@ -110,6 +110,4 @@ If you use the released models or code, please cite
 
 ## License
 
-The trained model is provided under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
-
-The code is under the [MIT License](https://choosealicense.com/licenses/mit/).
+The trained model and the code is provided under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
