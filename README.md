@@ -90,7 +90,7 @@ Then you can evaluate and visualize the result using ``evaluate.ipynb``
 
 ## Run on other CT scans
 
-Currently only nifti file accepted, we will update the data I/O for more formats like dicoms. 
+Currently only nifti files are accepted, we will update the data I/O for more formats like dicoms. 
 
 ```bash
 python test.py -D <path to your nifti file> -S <path to save folder>
