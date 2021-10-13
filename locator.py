@@ -1,3 +1,26 @@
+'''
+This script is derived from 
+https://github.com/javiribera/locating-objects-without-bboxes/blob/master/object-locator/models/unet_model.py
+
+under License CC BY-NC-SA 4.0, more details about the license
+https://github.com/javiribera/locating-objects-without-bboxes/blob/master/COPYRIGHT.txt
+'''
+
+__copyright__ = \
+"""
+Copyright &copyright © (c) 2019 The Board of Trustees of Purdue University and the Purdue Research Foundation.
+All rights reserved.
+This software is covered by US patents and copyright.
+This source code is to be used for academic research purposes only, and no commercial use is allowed.
+For any questions, please contact Edward J. Delp (ace@ecn.purdue.edu) at Purdue University.
+
+"""
+__license__ = "CC BY-NC-SA 4.0"
+__authors__ = "Javier Ribera, David Guera, Yuhao Chen, Edward J. Delp"
+__version__ = "1.6.0"
+
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

@@ -1,3 +1,16 @@
+__copyright__ = \
+"""
+Copyright &copyright © (c) 2021 Inria Grenoble Rhône-Alpes.
+All rights reserved.
+
+This source code is to be used for academic research purposes only, and no commercial use is allowed.
+
+"""
+__license__ = "CC BY-NC-SA 4.0"
+__authors__ = "Eslam Mohammed, Di Meng"
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx

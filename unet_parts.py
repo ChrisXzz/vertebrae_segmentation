@@ -1,85 +1,116 @@
-# sub-parts of the U-Net model
+'''
+This script is from 
+https://github.com/javiribera/locating-objects-without-bboxes/blob/master/object-locator/models/unet_parts.py
 
-import math
+under License CC BY-NC-SA 4.0, more details about the license
+https://github.com/javiribera/locating-objects-without-bboxes/blob/master/COPYRIGHT.txt
+'''
+
+__copyright__ = \
+"""
+Copyright &copyright © (c) 2019 The Board of Trustees of Purdue University and the Purdue Research Foundation.
+All rights reserved.
+This software is covered by US patents and copyright.
+This source code is to be used for academic research purposes only, and no commercial use is allowed.
+For any questions, please contact Edward J. Delp (ace@ecn.purdue.edu) at Purdue University.
+
+"""
+__license__ = "CC BY-NC-SA 4.0"
+__authors__ = "Javier Ribera, David Guera, Yuhao Chen, Edward J. Delp"
+__version__ = "1.6.0"
+
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
+
+from unet_parts import *
 
 
-class double_conv(nn.Module):
-    def __init__(self, in_ch, out_ch, normaliz=True):
-        super(double_conv, self).__init__()
+class UNet(nn.Module):
+    def __init__(self, n_channels, n_classes,
+                 height, width,
+                 known_n_points=None):
+        super(UNet, self).__init__()
 
-        ops = []
-        ops += [nn.Conv2d(in_ch, out_ch, 3, padding=1)]
-        # ops += [nn.Dropout(p=0.1)]
-        if normaliz:
-            ops += [nn.BatchNorm2d(out_ch)]
-        ops += [nn.ReLU(inplace=True)]
-        ops += [nn.Conv2d(out_ch, out_ch, 3, padding=1)]
-        # ops += [nn.Dropout(p=0.1)]
-        if normaliz:
-            ops += [nn.BatchNorm2d(out_ch)]
-        ops += [nn.ReLU(inplace=True)]
+        # With this network depth, there is a minimum image size
+        if height < 256 or width < 256:
+            raise ValueError('Minimum input image size is 256x256, got {}x{}'.\
+                             format(height, width))
 
-        self.conv = nn.Sequential(*ops)
-
-    def forward(self, x):
-        x = self.conv(x)
-        return x
-
-
-class inconv(nn.Module):
-    def __init__(self, in_ch, out_ch):
-        super(inconv, self).__init__()
-        self.conv = double_conv(in_ch, out_ch)
-
-    def forward(self, x):
-        x = self.conv(x)
-        return x
+        self.inc = inconv(n_channels, 64) # 512
+        self.down1 = down(64, 128) # 256
+        self.down2 = down(128, 256) # 128
+        self.down3 = down(256, 512) # 64
+        self.down4 = down(512, 512) # 32
+        self.down5 = down(512, 512) # 16
+        self.down6 = down(512, 512) # 8
+        self.down7 = down(512, 512) # 4
+        self.down8 = down(512, 512, normaliz=False) # 2
 
 
-class down(nn.Module):
-    def __init__(self, in_ch, out_ch, normaliz=True):
-        super(down, self).__init__()
-        self.mpconv = nn.Sequential(
-            nn.MaxPool2d(2),
-            double_conv(in_ch, out_ch, normaliz=normaliz)
-        )
+        self.up1 = up(1024, 512)
+        self.up2 = up(1024, 512)
+        self.up3 = up(1024, 512)
+        self.up4 = up(1024, 512)
+        self.up5 = up(1024, 256)
+        self.up6 = up(512, 128)
+        self.up7 = up(256, 64)
+        self.up8 = up(128, 64)
+        self.outc = outconv(64, n_classes)
+        self.out_nonlin = nn.Sigmoid()
 
-    def forward(self, x):
-        x = self.mpconv(x)
-        return x
+        self.known_n_points = known_n_points
+        if known_n_points is None:
+            self.regressor = nn.Linear(int(height)*int(width) + 512*int(height/(2**8))**2, 1)
+            self.regressor_nonlin = nn.Softplus()
 
-
-class up(nn.Module):
-    def __init__(self, in_ch, out_ch):
-        super(up, self).__init__()
-        self.up = nn.Upsample(scale_factor=2,
-                              mode='bilinear',
-                              align_corners=True)
-        # self.up = nn.ConvTranspose2d(in_ch, out_ch, 2, stride=2)
-        self.conv = double_conv(in_ch, out_ch)
-
-    def forward(self, x1, x2):
-        x1 = self.up(x1)
-        diffY = x2.size()[2] - x1.size()[2]
-        diffX = x2.size()[3] - x1.size()[3]
-        x1 = F.pad(x1, (diffX // 2, int(math.ceil(diffX / 2)),
-                        diffY // 2, int(math.ceil(diffY / 2))))
-        x = torch.cat([x2, x1], dim=1)
-        x = self.conv(x)
-        return x
-
-
-class outconv(nn.Module):
-    def __init__(self, in_ch, out_ch):
-        super(outconv, self).__init__()
-        self.conv = nn.Conv2d(in_ch, out_ch, 1)
-        # self.conv = nn.Sequential(
-            # nn.Conv2d(in_ch, out_ch, 1),
-        # )
+        # This layer is not connected anywhere
+        # It is only here for backward compatibility
+        self.lin = nn.Linear(1, 1, bias=False)
 
     def forward(self, x):
-        x = self.conv(x)
-        return x
+
+        batch_size = x.shape[0]
+
+        x1 = self.inc(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        x6 = self.down5(x5)
+        x7 = self.down6(x6)
+        x8 = self.down7(x7)
+        x9 = self.down8(x8)
+
+
+        x = self.up1(x9, x8)
+        x = self.up2(x, x7)
+        x = self.up3(x, x6)
+        x = self.up4(x, x5)
+        x = self.up5(x, x4)
+        x = self.up6(x, x3)
+        x = self.up7(x, x2)
+        x = self.up8(x, x1)
+        x = self.outc(x)
+        x = self.out_nonlin(x)
+
+
+        # Reshape Bx1xHxW -> BxHxW
+        # because probability map is real-valued by definition
+        x = x.squeeze(1)
+
+        if self.known_n_points is None:
+            x_flat = x.view(batch_size, -1)
+            x9_flat = x9.view(batch_size, -1)
+            regression_features = torch.cat((x_flat, x9_flat), dim=1)
+
+            regression = self.regressor(regression_features)
+            regression = self.regressor_nonlin(regression)
+
+            return x, regression
+        else:
+            n_pts = torch.tensor([self.known_n_points]*batch_size)
+            return x, n_pts

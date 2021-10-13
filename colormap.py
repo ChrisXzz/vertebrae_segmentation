@@ -1,6 +1,12 @@
+''' 
+The colormap is from Sekuboyina A 's Github:
+https://github.com/anjany/verse
 
-### the colormap is derived from Sekuboyina A 's Github:
-### https://github.com/anjany/verse
+under MIT license
+''' 
+
+__author__      = "Anjany Sekuboyina"
+
 
 v_dict = {
     1: 'C1', 2: 'C2', 3: 'C3', 4: 'C4', 5: 'C5', 6: 'C6', 7: 'C7',

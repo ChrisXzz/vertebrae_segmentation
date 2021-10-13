@@ -1,3 +1,15 @@
+__copyright__ = \
+"""
+Copyright &copyright © (c) 2021 Inria Grenoble Rhône-Alpes.
+All rights reserved.
+
+This source code is to be used for academic research purposes only, and no commercial use is allowed.
+
+"""
+__license__ = "CC BY-NC-SA 4.0"
+__authors__ = "Di Meng"
+
+
 import torch.nn as nn 
 
 def conv3d(in_channels, out_channels, kernel_size=3, bias=False, padding=1, stride=1):
