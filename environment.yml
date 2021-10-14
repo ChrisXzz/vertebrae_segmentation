@@ -13,3 +13,4 @@ dependencies:
         - networkx
         - nibabel
         - simpleitk
+        - jupyter
