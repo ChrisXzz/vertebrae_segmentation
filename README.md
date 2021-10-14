@@ -1,12 +1,13 @@
 # Vertebrae segmentation
 
-This is an associated repository of the work 
+This is the associated repository of the work 
 
 **Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.**
 
 Pre-print: [link]().
 
-It includes the proposed pipeline which is able to segment and label vertebrae from CT images of variant resolution, orientation and field of view. You could test the pipeline following the steps below.
+It includes the proposed pipeline to segment and label vertebrae from CT images with arbitrary field of view. 
+To test the pipeline, please follow the steps below.
 
 ![visu](visu.png)
 
@@ -25,21 +26,27 @@ conda env create -f environment.yml
 conda activate verse20
 ```
 
-If you use pip installation, run
+If you use another virtual environment (virtualenv, pyenv, ...), create it and activate it.
+
+Then install the requirements,
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Now you should have all the dependencies that the pipeline needs.
+Now you should have all the required dependencies.
 
 ## Get the data
 
-The method is developed using the [VerSe20 challenge](https://verse2020.grand-challenge.org/) public training set. The released models were trained using 80 scans of it. To test the pipeline on VerSe20 public and hidden testset, download the data from its [Github](https://github.com/anjany/verse). More details about the dataset can be found in the publication [Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.](https://doi.org/10.1016/j.media.2021.102166)
+The released model was trained on the [VerSe20 challenge](https://verse2020.grand-challenge.org/) public training set. 
+To reproduce the results of the paper you will need to downlad the VerSe20 public and hidden testset from [Github](https://github.com/anjany/verse). 
 
-## Run the pipeline on VerSe20 testset
+More details about the dataset can be found in the publication [Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.](https://doi.org/10.1016/j.media.2021.102166)
 
-The challenge data structure you downloaded should be like
+## Run the model on VerSe20 testset
+
+The *challenge data structure* you downloaded should be the one below:
+
 
 ```
 ../verse20_miccai_challenge
@@ -56,10 +63,19 @@ The challenge data structure you downloaded should be like
 	  ...
 ```
 
-To process the public or hidden testset, run
+Please be careful, VerSe authors also release a *Sub-directory-based arrangement for each patient* which is different and won't work with the provided code.
+
+
+To process the public testset, run
 
 ```bash
 python test_verse.py -D <path to folder>/02_validation
+```
+
+To process the hidden testset, run
+
+```bash
+python test_verse.py -D <path to folder>/03_test
 ```
 
 The output for each input CT scan is a multi-label segmentation mask and a json file with labels and centroid coordinates.
