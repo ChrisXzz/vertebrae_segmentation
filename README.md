@@ -41,7 +41,7 @@ Now you should have all the required dependencies.
 To test that your code is operational we provide a sample demo. You can run it 
 
 ```bash
-python test.py -D sample/verse815_CT-iso.nii.gz -S sample/
+python test.py -D sample/verse815_CT-iso.nii.gz -S sample/ -F
 ```
 
 The output is going to be in the "sample" folder. You can evaluate and visualize the result by running
