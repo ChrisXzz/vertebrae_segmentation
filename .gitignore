@@ -1,1 +1,3 @@
 __pycache__
+third_party/locator/__pycache__
+*.pyc
