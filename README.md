@@ -50,6 +50,10 @@ The output is going to be in the "sample" folder. You can evaluate and visualize
 jupyter notebook evaluate.ipynb
 ```
 
+The result should be consistent with 
+
+![sample_metrics](sample/sample_metrics.png)
+
 ## Get the data
 
 The released model was trained on the [VerSe20 challenge](https://verse2020.grand-challenge.org/) public training set. 
