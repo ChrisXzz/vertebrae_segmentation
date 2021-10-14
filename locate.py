@@ -145,7 +145,7 @@ def resize_512_coronal(img):
 
 def load_locator_model(model_file):
     import torch 
-    from third_party_locator import unet_model
+    from third_party.locator import unet_model
     model = unet_model.UNet(1, 1,
                             height=512,
                             width=512, 
