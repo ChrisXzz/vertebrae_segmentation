@@ -36,6 +36,20 @@ pip install -r requirements.txt
 
 Now you should have all the required dependencies.
 
+## Run a demo
+
+To test that your code is operational we provide a sample demo. You can run it 
+
+```bash
+python test.py -D sample/verse815_CT-iso.nii.gz -S sample/
+```
+
+The output is going to be in the "sample" folder. You can evaluate and visualize the result by running
+
+```bash
+jupyter notebook evaluate.ipynb
+```
+
 ## Get the data
 
 The released model was trained on the [VerSe20 challenge](https://verse2020.grand-challenge.org/) public training set. 
@@ -80,29 +94,21 @@ python test_verse.py -D <path to folder>/03_test
 
 The output for each input CT scan is a multi-label segmentation mask and a json file with labels and centroid coordinates.
 
-You could specify the save folder by 
+You can specify the save folder with the -S option
 
 ```bash
-python test_verse.py -D <path to folder>/02_validation -S <path to save folder>
+python test_verse.py -D <path to folder>/02_validation -S <path to output folder>
 ```
 
-Otherwise, the results would be saved directly in a subfolder ``results/``.
+The default <path to output folder> is ``results/``.
 
-To process one scan instead of the whole dataset, provide the scan ID, eg. GL017
+To process one scan instead of the whole dataset, you can use the -V option and
+provide the scan ID (eg. GL017):
 
 ```bash
 python test_verse.py -D <path to folder>/02_validation -V GL017
 ```
 
-## Run a demo
-
-If you feel too heavy to download the whole VerSe20 dataset, we prepare a sample for you to run a demo.
-
-```bash
-python test.py -D sample/verse815_CT-iso.nii.gz -S sample/
-```
-
-Then you can evaluate and visualize the result using ``evaluate.ipynb``
 
 ## Run on other CT scans
 
