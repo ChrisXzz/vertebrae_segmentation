@@ -3,7 +3,8 @@ __copyright__ = \
 Copyright &copyright © (c) 2021 Inria Grenoble Rhône-Alpes.
 All rights reserved.
 
-This source code is to be used for academic research purposes only, and no commercial use is allowed.
+This source code is to be used for academic research purposes only.
+For commercial uses of the code, please send an email to edmond.boyer@inria.fr and sergi.pujades@inria.fr
 
 """
 __license__ = "CC BY-NC-SA 4.0"
@@ -144,11 +145,11 @@ def resize_512_coronal(img):
 
 def load_locator_model(model_file):
     import torch 
-    from locator import UNet
-    model = UNet(1, 1,
-                    height=512,
-                    width=512, 
-                    known_n_points=None)
+    from third_party_locator import unet_model
+    model = unet_model.UNet(1, 1,
+                            height=512,
+                            width=512, 
+                            known_n_points=None)
 
     state_dict = torch.load(model_file)
     model.load_state_dict(state_dict)

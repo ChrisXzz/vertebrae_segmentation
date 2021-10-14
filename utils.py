@@ -3,7 +3,8 @@ __copyright__ = \
 Copyright &copyright © (c) 2021 Inria Grenoble Rhône-Alpes.
 All rights reserved.
 
-This source code is to be used for academic research purposes only, and no commercial use is allowed.
+This source code is to be used for academic research purposes only.
+For commercial uses of the code, please send an email to edmond.boyer@inria.fr and sergi.pujades@inria.fr
 
 """
 __license__ = "CC BY-NC-SA 4.0"

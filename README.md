@@ -111,3 +111,8 @@ If you use the released models or code, please cite
 ## License
 
 The trained model and the code is provided under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
+
+
+## Commercial licensing opportunities
+
+For commercial uses of the Data & Software, please send an email to [Edmond Boyer](mailto:edmond.boyer@inria.fr) and [Sergi Pujades](mailto:sergi.pujades-rocamora@inria.fr).
