@@ -116,8 +116,8 @@ python test_verse.py -D <path to folder>/02_validation -V GL017
 
 # Run on other CT scans
 
-Currently only nifti files are accepted. You can use third party softwares to convert from your format to nifti,
-for instance [ITK-SNAP](http://www.itksnap.org/pmwiki/pmwiki.php).
+Currently only nifti files are accepted. You can use third party softwares to convert from your format to nifti.
+For instance [ITK-SNAP](http://www.itksnap.org/pmwiki/pmwiki.php), open main image -> save image -> choose file format "NiFTI".
 
 Please make sure that the patient orientation (RAI code) is properly filled in.
 Then run
