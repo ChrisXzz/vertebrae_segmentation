@@ -54,7 +54,7 @@ The result should be consistent with
 
 ![sample_metrics](sample/sample_metrics.png)
 
-## Get the data
+# Reproduce VerSe20 results
 
 The released model was trained on the [VerSe20 challenge](https://verse2020.grand-challenge.org/) public training set. 
 To reproduce the results of the paper you will need to downlad the VerSe20 public and hidden testset from [Github](https://github.com/anjany/verse). 
@@ -64,7 +64,6 @@ More details about the dataset can be found in the publication [Sekuboyina A et 
 ## Run the model on VerSe20 testset
 
 The *challenge data structure* you downloaded should be the one below:
-
 
 ```
 ../verse20_miccai_challenge
@@ -106,6 +105,8 @@ python test_verse.py -D <path to folder>/02_validation -S <path to output folder
 
 The default <path to output folder> is ``results/``.
 
+## Evaluating individual scans
+
 To process one scan instead of the whole dataset, you can use the -V option and
 provide the scan ID (eg. GL017):
 
@@ -113,22 +114,26 @@ provide the scan ID (eg. GL017):
 python test_verse.py -D <path to folder>/02_validation -V GL017
 ```
 
+# Run on other CT scans
 
-## Run on other CT scans
+Currently only nifti files are accepted. You can use third party softwares to convert from your format to nifti,
+for instance [ITK-SNAP](http://www.itksnap.org/pmwiki/pmwiki.php).
 
-Currently only nifti files are accepted, we will update the data I/O for more formats like dicoms. 
+Please make sure that the patient orientation (RAI code) is properly filled in.
+Then run
 
 ```bash
-python test.py -D <path to your nifti file> -S <path to save folder>
+python test.py -D <path to your nifti file> -S <path to output folder>
 ```
+
 
 ## Contact
 
-For any questions, please contact [Di Meng](mailto:di.meng@inria.fr) or [Sergi Pujades](mailto:sergi.pujades-rocamora@inria.fr).
+For any questions about the paper and repository, please contact [Di Meng](mailto:di.meng@inria.fr) and [Sergi Pujades](mailto:sergi.pujades-rocamora@inria.fr).
 
 ## Citing 
 
-If you use the released models or code, please cite
+If you use the released models or code, please cite both
 
 1. **Meng D et al.,Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.** [link]()
 2. **Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.** [https://doi.org/10.1016/j.media.2021.102166](https://doi.org/10.1016/j.media.2021.102166)
