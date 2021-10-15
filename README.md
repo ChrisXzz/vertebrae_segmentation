@@ -17,6 +17,12 @@ To test the pipeline, please follow the steps below.
 git clone https://gitlab.inria.fr/spine/vertebrae_segmentation.git
 ```
 
+## Hardware requirements
+
+A graphics card (GPU) is needed. (Be aware that 2G is not enough)
+
+The code has been tested on: Ubuntu 18.04, RTX  Quadro 4000 8Gb, cuda 10.1
+
 ## Set up a python environment
 
 If you use [anaconda or miniconda](https://docs.anaconda.com/anaconda/install/index.html), run the following to create and activate a virtual environment:
