@@ -37,6 +37,8 @@ if __name__ == "__main__":
     import argparse, os, glob, sys
     from utils import mkpath, read_isotropic_pir_img_from_nifti_file
     import numpy as np 
+    import torch
+    torch.set_grad_enabled(False)
 
 
     parser = argparse.ArgumentParser(description='Run pipeline on a single CT scan.')
