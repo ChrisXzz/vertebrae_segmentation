@@ -19,7 +19,7 @@ git clone https://gitlab.inria.fr/spine/vertebrae_segmentation.git
 
 ## Hardware requirements
 
-A graphics card (GPU) is needed. (Be aware that 2G is not enough)
+A graphics card (GPU) with minimum 3Gb is needed. 
 
 The code has been tested on: Ubuntu 18.04, RTX  Quadro 4000 8Gb, cuda 10.1
 
