@@ -14,3 +14,4 @@ dependencies:
         - nibabel
         - simpleitk
         - jupyter
+        - pandas
