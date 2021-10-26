@@ -4,7 +4,7 @@ This is the associated repository of the work
 
 **Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.**
 
-Pre-print: [link]().
+Pre-print: [http://arxiv.org/abs/2110.12177](http://arxiv.org/abs/2110.12177).
 
 It includes the proposed pipeline to segment and label vertebrae from CT images with arbitrary field of view. 
 To test the pipeline, please follow the steps below.
@@ -141,7 +141,7 @@ For any questions about the paper and repository, please contact [Di Meng](mailt
 
 If you use the released models or code, please cite both
 
-1. **Meng D et al.,Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.** [link]()
+1. **Meng D et al.,Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.** [http://arxiv.org/abs/2110.12177](http://arxiv.org/abs/2110.12177)
 2. **Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.** [https://doi.org/10.1016/j.media.2021.102166](https://doi.org/10.1016/j.media.2021.102166)
 
 
