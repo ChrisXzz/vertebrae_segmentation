@@ -142,7 +142,9 @@ def per_vertebra_classification(msk_cube, model_file, classify_level, with_cente
 
 
 
-def predict_individuals(vol, locations, group_model_file, cer_model_file, thor_model_file, lum_model_file):
+def predict_individuals(vol, locations, loc_has_converged,
+                        group_model_file, cer_model_file, 
+                        thor_model_file, lum_model_file):
     import numpy as np 
 
     n_verts = len(locations)
@@ -156,7 +158,12 @@ def predict_individuals(vol, locations, group_model_file, cer_model_file, thor_m
     pred_labels = []
 
     # input volume is binary
-    for i, loc in enumerate(locations):
+    for i, (loc, has_conv) in enumerate(zip(locations, loc_has_converged)):
+
+        if not has_conv:
+            probabilities[i,:] = np.ones(24) * (1./24.)
+            pred_labels.append(-1)
+            continue
 
         vert_cube = extract_single_cube(loc, vol)
 
@@ -222,22 +229,26 @@ def getPath(probabilities, g_cost):
     return optimized_path
 
 
-def labelling(vol, locations, group_model_file, cer_model_file, thor_model_file, lum_model_file):
+def labelling(vol, locations, loc_has_converged, 
+              group_model_file, cer_model_file, 
+              thor_model_file, lum_model_file):
 
-    probabilities, pred_labels, group_cost = predict_individuals(vol, locations, group_model_file, cer_model_file, thor_model_file, lum_model_file)
+    probabilities, pred_labels, group_cost = predict_individuals(vol, locations, loc_has_converged, group_model_file, cer_model_file, thor_model_file, lum_model_file)
     path = getPath(probabilities, group_cost)
 
     return path 
 
 
-def labelling_2msk(mask_bin, mask_indiv, locations, group_model_file, 
-                    cer_model_file, thor_model_file, lum_model_file):
+def labelling_2msk(mask_bin, mask_indiv, 
+                   locations, loc_has_converged,
+                   group_model_file, cer_model_file, 
+                   thor_model_file, lum_model_file):
 
     import numpy as np 
     import torch
 
-    probabilities_bin, pred_labels, g_cost_bin = predict_individuals(mask_bin, locations, group_model_file, cer_model_file, thor_model_file, lum_model_file)
-    probabilities_ind, pred_labels, g_cost_ind = predict_individuals(mask_indiv, locations, group_model_file, cer_model_file, thor_model_file, lum_model_file)
+    probabilities_bin, pred_labels, g_cost_bin = predict_individuals(mask_bin, locations, loc_has_converged, group_model_file, cer_model_file, thor_model_file, lum_model_file)
+    probabilities_ind, pred_labels, g_cost_ind = predict_individuals(mask_indiv, locations, loc_has_converged, group_model_file, cer_model_file, thor_model_file, lum_model_file)
 
 
     probabilities = np.mean(np.array([probabilities_bin, probabilities_ind]), axis=0)

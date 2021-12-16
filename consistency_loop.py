@@ -633,8 +633,8 @@ def update_locations_masks_labels(extra_masks, extra_locs, extra_refinement, ext
 
     binary_mask_agg = np.logical_or(binary_mask_agg, individual_binary_mask).astype(np.int)
 
-    labels = labelling_2msk(binary_mask, individual_binary_mask, locations, model_file_id_group, 
-                            model_file_id_cer, model_file_id_thor, model_file_id_lum)
+    labels = labelling_2msk(binary_mask, individual_binary_mask, locations, loc_has_converged, 
+                            model_file_id_group, model_file_id_cer, model_file_id_thor, model_file_id_lum)
 
     assert len(locations) == len(labels) == len(idv_mask_list)
 
@@ -1018,8 +1018,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
             binary_mask_agg = np.logical_or(binary_mask, individual_binary_mask).astype(np.int)
 
-            labels = labelling_2msk(binary_mask, individual_binary_mask, locations, model_file_id_group,
-                                    model_file_id_cer, model_file_id_thor, model_file_id_lum)
+            labels = labelling_2msk(binary_mask, individual_binary_mask, locations, loc_has_converged, 
+                                    model_file_id_group, model_file_id_cer, model_file_id_thor, model_file_id_lum)
 
         else:
             individual_binary_mask = np.zeros(binary_mask.shape)
