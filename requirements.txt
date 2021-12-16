@@ -9,3 +9,4 @@ networkx==2.5
 nibabel==2.5.0
 simpleitk==1.2.4
 jupyter==1.0.0
+pandas==0.25.3
