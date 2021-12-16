@@ -300,9 +300,9 @@ def verse_metrics(gt_seg_file, gt_ctd_file,
         hd_list.append(hd)
 
 
-    mse_list = [mse for mse in mse_list if mse]
-    hd_list = [hd for hd in hd_list if hd]
-    dsc_list = [dsc for dsc in dsc_list if dsc]
+    mse_list = [mse for mse in mse_list if mse is not None]
+    hd_list = [hd for hd in hd_list if hd is not None]
+    dsc_list = [dsc for dsc in dsc_list if dsc is not None]
 
     metric['mean'] = []
 

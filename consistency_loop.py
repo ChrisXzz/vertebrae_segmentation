@@ -536,6 +536,7 @@ def get_extra_locations_from_components(components, cc_labels, locations):
 def extra_locations_refinement(extra_locations, locations, extra_labels, pir_img, binary_mask,
                                 idv_mask_list, model_file_seg_idv, fishing=False):
 
+    import numpy as np 
 
     extra_masks = []
     extra_locs = []
@@ -549,7 +550,26 @@ def extra_locations_refinement(extra_locations, locations, extra_labels, pir_img
                                                     [True], converged, model_file_seg_idv, max_iter=10)
 
         if len(new_loc_list) == 0:
-            continue 
+            if not fishing:
+                continue 
+            else:
+                if  extra_label !=25:  # if we go for fishing, we keep the vertebrae till L5
+                    
+                    psudo_mask = np.zeros(pir_img.shape)
+                    psudo_mask[x,y,z] = 1
+                    extra_masks.append(psudo_mask)
+                    extra_locs.append(loc)
+                    extra_refinement.append(False)
+                    extra_convergence.append(False)
+
+                    print('unstable location label {} at {}, adding it'.format(loc, extra_label))
+
+                    return extra_masks, extra_locs, extra_refinement, extra_convergence
+                else:  # L6 not found, we don't add it
+
+                    print('unstable location L6, discarding it')
+                    continue 
+
 
         for new_loc, mask in zip(new_loc_list, mask_list):
 
@@ -1128,7 +1148,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
             if fish_down_counter >= 5:
                 break 
 
-            if labels[-1] < 24:
+            if labels[-1] < 25:
                 extra_locations_fished = fish_down(locations[-2], locations[-1], pir_img.shape[1])
                 if extra_locations_fished is not None:
                     extra_locations.append(extra_locations_fished)
