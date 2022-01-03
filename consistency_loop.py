@@ -478,7 +478,8 @@ def get_extra_locations_from_components(components, cc_labels, locations):
     locations = np.array(loc_list)
 
     ## add two locations per time to accelerate the process when there's few detections
-    if len(locations) > 0 and len(locations) <= 3:
+    # if len(locations) > 0 and len(locations) <= 3:
+    if len(locations) == 1 and len(components) == 1:
         for component, cc_label in zip(components, cc_labels):
             x_array, y_array, _z_array = np.where(component>0)
 
