@@ -83,7 +83,7 @@ def masks_overlapping_pct(mask1, mask2):
         return intersection_count/union_count
 
 
-def loc_and_msk_convergence(loc_dist_list, msk_pct_list):
+def loc_and_msk_convergence(loc_iter_list, loc_dist_list, msk_pct_list):
 
     if not loc_dist_list or not msk_pct_list:
         return False
@@ -98,12 +98,11 @@ def loc_and_msk_convergence(loc_dist_list, msk_pct_list):
             return True
 
             
-        for i in range(2, len(loc_dist_list)+1):
-            if loc_dist_list[-i] == loc_dist_list[-1] and (msk_pct_list[-i] == msk_pct_list[-1]):
-                if i == 2:
-                    print('Convergence obtained. ')
-                else:
-                    print('Oscillation detected in {} round.'.format(i-1))
+        current_loc = loc_iter_list[-1]
+
+        for i in range(2, len(loc_iter_list)+1):
+            if (loc_iter_list[-i] == current_loc).all():
+                print('Oscillation detected in {} round.'.format(i-1))
                 return True
 
         print('Convergence failed.')
@@ -139,7 +138,9 @@ def duplicated_locations_index(individual_mask_list):
     return duplicated_locations_idx
 
 
-def remove_duplicated_locations_with_masks(location_list, mask_list, idx_list):
+def remove_duplicated_locations_with_masks(location_list, mask_list, 
+                                           loc_has_converged_list, loc_needs_refinement_list, 
+                                           idx_list):
     # remove duplicated locations and masks by index and sort in order
     import numpy as np 
 
@@ -149,36 +150,53 @@ def remove_duplicated_locations_with_masks(location_list, mask_list, idx_list):
 
         sort_idx = np.argsort(locations[:,1])
         locations = locations[sort_idx]
+
+        loc_has_converged= np.array(loc_has_converged_list)
+        loc_has_converged = loc_has_converged[sort_idx]
+
+        loc_needs_refinement= np.array(loc_needs_refinement_list)
+        loc_needs_refinement = loc_needs_refinement[sort_idx]
+
         masks = []
         for i in sort_idx:
             masks.append(mask_list[i])
-        return locations, masks 
+        return locations, masks, loc_has_converged.tolist(), loc_needs_refinement.tolist()
 
     else:
         for idx in sorted(idx_list, reverse=True):
             del location_list[idx]
             del mask_list[idx]
+            del loc_has_converged_list[idx]
 
         locations = np.array(location_list)
         sort_idx = np.argsort(locations[:,1])
         locations = locations[sort_idx]
+
+        loc_has_converged= np.array(loc_has_converged_list)
+        loc_has_converged = loc_has_converged[sort_idx]
+
+        loc_needs_refinement= np.array(loc_needs_refinement_list)
+        loc_needs_refinement = loc_needs_refinement[sort_idx]
+
         masks = []
         for i in sort_idx:
             masks.append(mask_list[i])
-        return locations, masks 
+        return locations, masks, loc_has_converged.tolist(), loc_needs_refinement.tolist()
 
 
-def locations_and_masks_without_duplication(loc_list, mask_list):
+
+def locations_and_masks_without_duplication(loc_list, mask_list, loc_has_converged, loc_needs_refinement):
     # remove duplicated locations based on the masks overlap
     import numpy as np 
 
     duplicated_locations_idx = duplicated_locations_index(mask_list)
 
-    locations, mask_list = remove_duplicated_locations_with_masks(loc_list, mask_list, 
-                                                        duplicated_locations_idx)
+    locations, mask_list, loc_has_converged, loc_needs_refinement = remove_duplicated_locations_with_masks(loc_list, mask_list, 
+                                                                                        loc_has_converged, loc_needs_refinement,
+                                                                                        duplicated_locations_idx)
     locations = np.array(locations).astype(np.int)
 
-    return locations, mask_list
+    return locations, mask_list, loc_has_converged, loc_needs_refinement
 
 
 def individual_binary_mask_from_list(mask_list):
@@ -247,7 +265,7 @@ def per_location_refiner_iter(loc, pir_img, model_file_seg_idv,
             in_bi = False if overlap_w_bi_per < 0.4 else True
 
 
-        if loc_and_msk_convergence(loc2pre_list, msk2pre_list) and in_bi:
+        if loc_and_msk_convergence(loc_iter_list, loc2pre_list, msk2pre_list) and in_bi:
             converged = True
             break
 
@@ -286,6 +304,8 @@ def locations_refiner_iter(loc_list, mask_list, labels, pir_img, binary_mask,
                                                             binary_mask, max_iter=max_iter)
 
         if loc is None:
+            loc_needs_refinement[i] = None
+            loc_has_converged[i] = None
             continue 
 
         new_locations.append(loc)
@@ -293,6 +313,12 @@ def locations_refiner_iter(loc_list, mask_list, labels, pir_img, binary_mask,
 
         loc_has_converged[i] = converged
         loc_needs_refinement[i] = True if labels[i] is None else False
+
+    while None in loc_has_converged:
+        loc_needs_refinement.remove(None)
+        loc_has_converged.remove(None)
+
+    assert len(new_locations) == len(new_idv_mask) == len(loc_needs_refinement) == len(loc_has_converged)
 
     return new_locations, new_idv_mask
 
@@ -588,10 +614,7 @@ def extra_locations_refinement(extra_locations, locations, extra_labels, pir_img
                 from segment_vertebra import per_location_refiner_segmentor
                 new_loc, mask = per_location_refiner_segmentor(x, y, z, pir_img, model_file_seg_idv)
 
-                if fishing and extra_label != 1:
-                    continue
-
-                if extra_mask_valid(new_loc, mask, locations, idv_mask_list):
+                if extra_mask_valid(new_loc, mask, locations, idv_mask_list) and extra_label == 1:
                     print('adding one shot mask for {}.'.format(extra_label))
                     extra_masks.append(mask)
                     extra_locs.append(new_loc)
@@ -606,7 +629,7 @@ def extra_locations_refinement(extra_locations, locations, extra_labels, pir_img
 
 def update_locations_masks_labels(extra_masks, extra_locs, extra_refinement, extra_convergence,
                                    locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
-                                   binary_mask, binary_mask_agg, model_file_id_group, model_file_id_cer,
+                                   sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                     model_file_id_thor, model_file_id_lum):
     import numpy as np 
     from identify import labelling_2msk 
@@ -632,16 +655,16 @@ def update_locations_masks_labels(extra_masks, extra_locs, extra_refinement, ext
 
     individual_binary_mask = individual_binary_mask_from_list(idv_mask_list)
 
-    binary_mask_agg = np.logical_or(binary_mask_agg, individual_binary_mask).astype(np.int)
+    binary_mask = np.logical_or(binary_mask, individual_binary_mask).astype(np.int)
 
-    labels = labelling_2msk(binary_mask, individual_binary_mask, locations, loc_has_converged, 
+    labels = labelling_2msk(sliding_mask, individual_binary_mask, locations, loc_has_converged, 
                             model_file_id_group, model_file_id_cer, model_file_id_thor, model_file_id_lum)
 
     assert len(locations) == len(labels) == len(idv_mask_list)
 
     # print('add {} extra locations. '.format(len(extra_masks)))
 
-    return locations, labels, idv_mask_list, individual_binary_mask, binary_mask_agg, loc_needs_refinement, loc_has_converged
+    return locations, labels, idv_mask_list, individual_binary_mask, binary_mask, loc_needs_refinement, loc_has_converged
     
 
 def get_group_interval_distribution(coeff_pkl_file='statistics/vertebrae_interval_distributions_coeff.pkl'):
@@ -680,10 +703,10 @@ def _is_gap_fitting_gauss_distribution(dist, label, cervical_coeff, thoracic_coe
     if distribute_coeff > 4 and _in_frange(dist, mean-3*sigma, mean+3*sigma) < 0:
         print('distribution NOT fit, label: {}, dist: {}, mean: {}, sigma: {}'.format(label, dist, mean, sigma))
 
-        return False
+        return [0, mean]
 
     print('distribution fit, label: {}, dist: {}, mean: {}, sigma: {}'.format(label, dist, mean, sigma))
-    return True
+    return [1, -1]
 
 
 def _is_gap_fitting_regressor(gap_list, idx, group_label):
@@ -830,9 +853,17 @@ def get_extra_locations_from_intervals(locations, labels):
 
     gap_list = []
 
-    for i, loc in enumerate(locations[:-1]):
+
+    loc_list = locations.tolist()
+    unique_locations = []
+    for loc in loc_list:
+        if loc not in unique_locations:
+            unique_locations.append(loc)
+
+
+    for i, loc in enumerate(unique_locations[:-1]):
         current_loc = loc 
-        next_loc = locations[i+1]
+        next_loc = unique_locations[i+1]
 
         dist = compute_dist(current_loc, next_loc)
 
@@ -849,15 +880,15 @@ def get_extra_locations_from_intervals(locations, labels):
         if_fit_regressor = _is_gap_fitting_regressor(gap_list, i, group_label)
         print('if fit regressor: ', if_fit_regressor)
 
-        if not if_fit_distr and not if_fit_regressor[0]:
 
+        if not if_fit_distr[0] and if_fit_regressor[0]:
 
-            pred_gap = if_fit_regressor[1]
+            pred_gap = if_fit_distr[1]
             num_extra_loc = int(gap//pred_gap)
             search_dist = int(gap/(num_extra_loc+1))
 
-            current_loc = locations[i]
-            next_loc = locations[i+1]
+            current_loc = unique_locations[i]
+            next_loc = unique_locations[i+1]
 
             extra_locs_gap = extra_locations_in_gaps(current_loc, next_loc, search_dist, num_extra_loc)
             extra_labels_gap = [label] * len(extra_locs_gap)
@@ -866,6 +897,26 @@ def get_extra_locations_from_intervals(locations, labels):
             extra_labels = extra_labels + extra_labels_gap
 
             assert len(extra_locs) == len(extra_labels)
+
+        elif not if_fit_distr[0] and not if_fit_regressor[0]:
+
+            pred_gap = if_fit_regressor[1]
+            num_extra_loc = int(gap//pred_gap)
+            search_dist = int(gap/(num_extra_loc+1))
+
+            current_loc = unique_locations[i]
+            next_loc = unique_locations[i+1]
+
+            extra_locs_gap = extra_locations_in_gaps(current_loc, next_loc, search_dist, num_extra_loc)
+            extra_labels_gap = [label] * len(extra_locs_gap)
+
+            extra_locs = extra_locs + extra_locs_gap
+            extra_labels = extra_labels + extra_labels_gap
+
+            assert len(extra_locs) == len(extra_labels)
+
+        else:
+            pass
 
     return extra_locs, extra_labels
 
@@ -890,7 +941,7 @@ def fish_up(loc1, loc2):
         return None
 
 
-def fish_down(loc1, loc2, y_size):
+def fish_down(loc1, loc2, vol_size):
     import numpy as np 
 
     d12 = compute_dist(loc1, loc2)
@@ -904,10 +955,10 @@ def fish_down(loc1, loc2, y_size):
 
     xl, yl, zl = x2+delta_x, y2+delta_y, z2+delta_z 
 
-    if yl > y_size:
-        return None
-    else:
+    if xl < vol_size[0] and yl < vol_size[1] and zl < vol_size[2]:
         return np.array([xl, yl, zl])
+    else:
+        return None 
 
 
 
@@ -960,6 +1011,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
     main_loop_counter = 0
 
     ### buffering the iterative results
+    sliding_mask = np.copy(binary_mask)
+
     labels = np.array([None for l in locations])
     idv_mask_list = [None for l in locations]
     loc_list = [] 
@@ -1010,16 +1063,17 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
         if len(loc_list) > 0:
 
-            locations, idv_mask_list = locations_refiner_iter(loc_list, idv_mask_list, labels, pir_img, binary_mask,
+            locations, idv_mask_list = locations_refiner_iter(loc_list, idv_mask_list, labels, pir_img, sliding_mask,
                                                               loc_needs_refinement, loc_has_converged,
                                                               model_file_seg_idv, max_iter=10)
-            locations, idv_mask_list = locations_and_masks_without_duplication(locations, idv_mask_list)
+            locations, idv_mask_list, loc_has_converged, loc_needs_refinement = locations_and_masks_without_duplication(locations, idv_mask_list,
+                                                                                                        loc_has_converged, loc_needs_refinement)
 
             individual_binary_mask = individual_binary_mask_from_list(idv_mask_list)
 
-            binary_mask_agg = np.logical_or(binary_mask, individual_binary_mask).astype(np.int)
+            binary_mask = np.logical_or(sliding_mask, individual_binary_mask).astype(np.int)
 
-            labels = labelling_2msk(binary_mask, individual_binary_mask, locations, loc_has_converged, 
+            labels = labelling_2msk(sliding_mask, individual_binary_mask, locations, loc_has_converged, 
                                     model_file_id_group, model_file_id_cer, model_file_id_thor, model_file_id_lum)
 
         else:
@@ -1049,8 +1103,13 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                 break 
 
             ## compute the connected components of masks residual
-            diff = binary_mask_agg - individual_binary_mask
+            diff = binary_mask - individual_binary_mask
             diff[diff!=1] = 0
+
+            ## erode the residual, avoiding components connected by noise
+            if len(locations) < 5:
+                from scipy.ndimage import morphology
+                diff = morphology.binary_erosion(diff).astype(diff.dtype)
 
             ccomponents, cc_labels = filtered_connected_components(diff, locations, labels, idv_mask_list)
 
@@ -1072,7 +1131,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                                                       locations,
                                                                                                       extra_labels, 
                                                                                                       pir_img, 
-                                                                                                      binary_mask_agg,
+                                                                                                      binary_mask,
                                                                                                       idv_mask_list,
                                                                                                       model_file_seg_idv)            
 
@@ -1083,10 +1142,10 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                 print('No extra masks added.')
                 break 
 
-            locations, labels, idv_mask_list, individual_binary_mask, binary_mask_agg, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
+            locations, labels, idv_mask_list, individual_binary_mask, binary_mask, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
                                                                                             extra_locs, extra_refinement, extra_convergence,
                                                                             locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
-                                                                                binary_mask, binary_mask_agg, model_file_id_group, model_file_id_cer,
+                                                                                sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                                                                     model_file_id_thor, model_file_id_lum)            
 
 
@@ -1109,7 +1168,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
             extra_locations_from_gap, extra_labels_from_gap = get_extra_locations_from_intervals(locations, labels)
 
-            if not extra_locations_from_gap:
+            if len(extra_locations_from_gap) == 0:
                 break 
 
             extra_locations = extra_locations + extra_locations_from_gap
@@ -1131,10 +1190,10 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                 print('No extra masks added.')
                 break 
 
-            locations, labels, idv_mask_list, individual_binary_mask, binary_mask_agg, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
+            locations, labels, idv_mask_list, individual_binary_mask, binary_mask, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
                                                                                             extra_locs, extra_refinement, extra_convergence,
                                                                             locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
-                                                                                binary_mask, binary_mask_agg, model_file_id_group, model_file_id_cer,
+                                                                                sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                                                                     model_file_id_thor, model_file_id_lum)            
 
         # ------------------------- 3. missing locations from fishing -----------------------------------
@@ -1150,7 +1209,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                 break 
 
             if labels[-1] < 25:
-                extra_locations_fished = fish_down(locations[-2], locations[-1], pir_img.shape[1])
+                extra_locations_fished = fish_down(locations[-2], locations[-1], pir_img.shape)
                 if extra_locations_fished is not None:
                     extra_locations.append(extra_locations_fished)
                     extra_labels.append(labels[-1]+1) 
@@ -1176,10 +1235,10 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                 print('No extra masks added.')
                 break 
 
-            locations, labels, idv_mask_list, individual_binary_mask, binary_mask_agg, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
+            locations, labels, idv_mask_list, individual_binary_mask, binary_mask, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
                                                                                             extra_locs, extra_refinement, extra_convergence,
                                                                             locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
-                                                                                binary_mask, binary_mask_agg, model_file_id_group, model_file_id_cer,
+                                                                                sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                                                                     model_file_id_thor, model_file_id_lum)            
 
         #### fishing up 
@@ -1220,10 +1279,10 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                 print('No extra masks added.')
                 break 
 
-            locations, labels, idv_mask_list, individual_binary_mask, binary_mask_agg, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
+            locations, labels, idv_mask_list, individual_binary_mask, binary_mask, loc_needs_refinement, loc_has_converged = update_locations_masks_labels(extra_masks, 
                                                                                             extra_locs, extra_refinement, extra_convergence,
                                                                             locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
-                                                                                binary_mask, binary_mask_agg, model_file_id_group, model_file_id_cer,
+                                                                                sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                                                                     model_file_id_thor, model_file_id_lum)            
 
         # ------------------------------------------------------------------------------------------------
