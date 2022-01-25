@@ -46,6 +46,7 @@ if __name__ == "__main__":
     parser.add_argument('-S', '--save_folder',  default='-1', type=str, help='folder to save the results')
     parser.add_argument('-V', '--vol_id', default='-1', type=str, help='process a single scan, default for all')
     parser.add_argument('-F', '--force_recompute', action='store_true', help='set True to recompute and overwrite the results')
+    parser.add_argument('-L', '--initial_locations', action='store_true', help='set True to use initial location predictions')
     args = parser.parse_args()
 
 
@@ -80,6 +81,7 @@ if __name__ == "__main__":
 
         for scan in scan_files:
             scanname = os.path.split(scan)[-1].split('_CT')[0]
+            # scanname = os.path.split(scan)[-1].split('_ct')[0]
 
 
             if os.path.exists(os.path.join(save_folder, '{}_seg.nii.gz'.format(scanname))) and not args.force_recompute:
@@ -108,9 +110,10 @@ if __name__ == "__main__":
             # Initial locations
             # =================================================================
 
-            locations = []
-            from locate import locate 
-            locations = locate(pir_img, models['loc_sagittal'], models['loc_coronal'])
+            locations = np.array([])
+            if args.initial_locations:
+                from locate import locate 
+                locations = locate(pir_img, models['loc_sagittal'], models['loc_coronal'])
 
             print(' ... obtained {} initial 3D locations '.format(len(locations)))
 
