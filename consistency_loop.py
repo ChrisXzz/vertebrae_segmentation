@@ -213,7 +213,7 @@ def individual_binary_mask_from_list(mask_list):
     return individual_binary_mask
 
 
-def per_location_refiner_iter(loc, pir_img, model_file_seg_idv, 
+def per_location_refiner_iter(loc, pir_img, model_file_seg_idv, seg_idv_norm,
                                 binary_mask, max_iter):
 
     from segment_vertebra import per_location_refiner_segmentor
@@ -233,7 +233,7 @@ def per_location_refiner_iter(loc, pir_img, model_file_seg_idv,
         loop_iter += 1
 
         x, y, z = loc[:]
-        loc, mask = per_location_refiner_segmentor(x, y, z, pir_img, model_file_seg_idv)
+        loc, mask = per_location_refiner_segmentor(x, y, z, pir_img, model_file_seg_idv, seg_idv_norm)
 
         if loc is None:
             loc_iter_list.append(None)
@@ -281,7 +281,7 @@ def per_location_refiner_iter(loc, pir_img, model_file_seg_idv,
 
 def locations_refiner_iter(loc_list, mask_list, labels, pir_img, binary_mask,
                            loc_needs_refinement, loc_has_converged,
-                           model_file_seg_idv, max_iter=None):
+                           model_file_seg_idv, seg_idv_norm, max_iter=None):
 
     import numpy as np 
 
@@ -300,7 +300,7 @@ def locations_refiner_iter(loc_list, mask_list, labels, pir_img, binary_mask,
             continue 
 
 
-        loc, mask, converged = per_location_refiner_iter(loc, pir_img, model_file_seg_idv, 
+        loc, mask, converged = per_location_refiner_iter(loc, pir_img, model_file_seg_idv, seg_idv_norm,
                                                             binary_mask, max_iter=max_iter)
 
         if loc is None:
@@ -561,7 +561,7 @@ def get_extra_locations_from_components(components, cc_labels, locations):
 
 
 def extra_locations_refinement(extra_locations, locations, extra_labels, pir_img, binary_mask,
-                                idv_mask_list, model_file_seg_idv, fishing=False):
+                                idv_mask_list, model_file_seg_idv, seg_idv_norm, fishing=False):
 
     import numpy as np 
 
@@ -574,7 +574,7 @@ def extra_locations_refinement(extra_locations, locations, extra_labels, pir_img
         converged = [False]
         x, y, z = loc[:]
         new_loc_list, mask_list = locations_refiner_iter([loc], [None], [extra_label], pir_img, binary_mask,
-                                                    [True], converged, model_file_seg_idv, max_iter=10)
+                                                    [True], converged, model_file_seg_idv, seg_idv_norm, max_iter=10)
 
         if len(new_loc_list) == 0:
             if not fishing:
@@ -612,7 +612,7 @@ def extra_locations_refinement(extra_locations, locations, extra_labels, pir_img
 
             else:
                 from segment_vertebra import per_location_refiner_segmentor
-                new_loc, mask = per_location_refiner_segmentor(x, y, z, pir_img, model_file_seg_idv)
+                new_loc, mask = per_location_refiner_segmentor(x, y, z, pir_img, model_file_seg_idv, seg_idv_norm)
 
                 if extra_mask_valid(new_loc, mask, locations, idv_mask_list) and extra_label == 1:
                     print('adding one shot mask for {}.'.format(extra_label))
@@ -1001,7 +1001,7 @@ def aggregate_multi_label_segmentation(idv_msk_list, labels):
 
 
 def consistency_refinement_close_loop(locations, pir_img, binary_mask,
-                                      model_file_seg_idv,
+                                      model_file_seg_idv, seg_idv_norm,
                                       model_file_id_group, model_file_id_cer,
                                       model_file_id_thor, model_file_id_lum):
 
@@ -1065,7 +1065,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
             locations, idv_mask_list = locations_refiner_iter(loc_list, idv_mask_list, labels, pir_img, sliding_mask,
                                                               loc_needs_refinement, loc_has_converged,
-                                                              model_file_seg_idv, max_iter=10)
+                                                              model_file_seg_idv, seg_idv_norm, max_iter=10)
             locations, idv_mask_list, loc_has_converged, loc_needs_refinement = locations_and_masks_without_duplication(locations, idv_mask_list,
                                                                                                         loc_has_converged, loc_needs_refinement)
 
@@ -1133,7 +1133,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                                                       pir_img, 
                                                                                                       binary_mask,
                                                                                                       idv_mask_list,
-                                                                                                      model_file_seg_idv)            
+                                                                                                      model_file_seg_idv,
+                                                                                                      seg_idv_norm)            
 
             extra_locations = []
             extra_labels = [] 
@@ -1182,7 +1183,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                                                       pir_img, 
                                                                                                       None,
                                                                                                       idv_mask_list,
-                                                                                                      model_file_seg_idv)            
+                                                                                                      model_file_seg_idv,
+                                                                                                      seg_idv_norm)            
             extra_locations = []
             extra_labels = [] 
             
@@ -1227,6 +1229,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                                                       None,
                                                                                                       idv_mask_list,
                                                                                                       model_file_seg_idv,
+                                                                                                      seg_idv_norm,
                                                                                                       fishing=True)            
             extra_locations = []
             extra_labels = [] 
@@ -1271,6 +1274,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                                                       None,
                                                                                                       idv_mask_list,
                                                                                                       model_file_seg_idv,
+                                                                                                      seg_idv_norm,
                                                                                                       fishing=True)            
             extra_locations = []
             extra_labels = [] 

@@ -118,7 +118,7 @@ def centroid_from_labeled_volume(vol, label=1):
     return np.round(ctd).astype(np.int)
 
 
-def per_location_refiner_segmentor(x, y, z, pir_img, model_file):
+def per_location_refiner_segmentor(x, y, z, pir_img, model_file, norm=False):
 
     import numpy as np 
 
@@ -140,7 +140,7 @@ def per_location_refiner_segmentor(x, y, z, pir_img, model_file):
                         z-cube_size_z//2:z+cube_size_z//2]
 
 
-    if False:    
+    if norm:    
         from utils import globalNormalization
         img_cube = globalNormalization(img_cube)
 

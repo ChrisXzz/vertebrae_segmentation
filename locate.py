@@ -346,7 +346,15 @@ def get_right_neighboor_idx(idx, zeros_list):
 def refine_z(coordinate_z):
 
     import numpy as np 
+    import warnings
+
+    if (coordinate_z==0).all():
+        warnings.warn('The z coordinates are empty for all the detected locations.')
+
+        return coordinate_z
+
     idx_zeros = np.where(coordinate_z==0)[0]
+
     for idx in idx_zeros:
         left_idx = get_left_neighboor_idx(idx, idx_zeros)
         right_idx = get_right_neighboor_idx(idx, idx_zeros)

@@ -12,10 +12,17 @@ __authors__ = "Di Meng"
 
 
 
-def load_models():
+def load_models(seg_spine_norm=False, seg_vert_norm=False):
 
-    model_file_seg_binary = 'models/segmentor_spine.pth'
-    model_file_seg_idv = 'models/segmentor_vertebra.pth'
+    if seg_spine_norm:
+        model_file_seg_binary = 'models/segmentor_spine_norm.pth'
+    else:
+        model_file_seg_binary = 'models/segmentor_spine.pth'
+
+    if seg_vert_norm:
+        model_file_seg_idv = 'models/segmentor_vertebra_norm.pth'
+    else:
+        model_file_seg_idv = 'models/segmentor_vertebra.pth'
 
     model_file_loc_sag = 'models/locator_sagittal.pth'
     model_file_loc_cor = 'models/locator_coronal.pth'
@@ -47,6 +54,8 @@ if __name__ == "__main__":
     parser.add_argument('-V', '--vol_id', default='-1', type=str, help='process a single scan, default for all')
     parser.add_argument('-F', '--force_recompute', action='store_true', help='set True to recompute and overwrite the results')
     parser.add_argument('-L', '--initial_locations', action='store_true', help='set True to use initial location predictions')
+    parser.add_argument('-Ns', '--seg_spine_norm', action='store_true', help='set True to use normalized spine segmentor')
+    parser.add_argument('-Nv', '--seg_vert_norm', action='store_true', help='set True to use normalized vertebra segmentor')
     args = parser.parse_args()
 
 
@@ -61,7 +70,7 @@ if __name__ == "__main__":
 
 
     ### load trained models
-    models = load_models()
+    models = load_models(seg_spine_norm=args.seg_spine_norm, seg_vert_norm=args.seg_vert_norm)
 
 
     ### load scan IDs (use the challange dataset strcuture)
@@ -102,7 +111,7 @@ if __name__ == "__main__":
             # =================================================================
 
             from segment_spine import binary_segmentor
-            binary_mask = binary_segmentor(pir_img, models['seg_binary'], mode='overlap', norm=False)
+            binary_mask = binary_segmentor(pir_img, models['seg_binary'], mode='overlap', norm=args.seg_spine_norm)
 
             print(' ... obtained spine binary segmentation ')
 
@@ -124,7 +133,7 @@ if __name__ == "__main__":
             from consistency_loop import consistency_refinement_close_loop
 
             multi_label_mask, locations, labels, loc_has_converged = consistency_refinement_close_loop(locations, pir_img, binary_mask,
-                                                                                models['seg_individual'],
+                                                                                models['seg_individual'], args.seg_vert_norm,
                                                                                 models['id_group'], models['id_cervical'],
                                                                                 models['id_thoracic'], models['id_lumbar'])            
 
