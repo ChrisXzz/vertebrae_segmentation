@@ -59,7 +59,7 @@ jupyter notebook evaluate.ipynb
 The result should be consistent with 
 
 <!-- ![sample_metrics](sample/sample_metrics.png){ width=50% } -->
-<img src="sample/sample_metrics.png" width="200">
+<img src="sample/sample_metrics.png" width="500">
 
 # Reproduce VerSe20 results
 
