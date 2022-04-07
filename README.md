@@ -58,7 +58,7 @@ jupyter notebook evaluate.ipynb
 
 The result should be consistent with 
 
-![sample_metrics](sample/sample_metrics.png)
+![sample_metrics](sample/sample_metrics.png =250x)
 
 # Reproduce VerSe20 results
 
