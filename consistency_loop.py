@@ -11,6 +11,24 @@ __license__ = "CC BY-NC-SA 4.0"
 __authors__ = "Di Meng"
 
 
+# for debugging
+def show_volslice_with_locations(img, locations, factor=0.5):
+    import matplotlib.pyplot as plt 
+
+    fig = plt.figure(figsize=(12.8, 9.6))
+
+    try:
+        x = locations[:,0]
+        y = locations[:,1]
+    except IndexError:
+        x = locations[0]
+        y = locations[1]
+
+    view_slice = int(img.shape[-1]*factor)
+    plt.imshow(img[:,:,view_slice])
+    plt.plot(y, x, '*', color='m')
+
+    plt.show()
 
 
 def check_locs_updated(prev_locations, locations, loc_threshold=1.5):
@@ -1008,6 +1026,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
     import numpy as np 
     from identify import labelling_2msk
 
+    visu = False
+
     main_loop_counter = 0
 
     ### buffering the iterative results
@@ -1023,6 +1043,9 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
     loc_needs_refinement = [True for l in locations]
     loc_has_converged = [False for l in locations]
+
+
+    if visu and len(locations)>0 and binary_mask is not None: show_volslice_with_locations(binary_mask, locations)
 
     while True:
         main_loop_counter += 1
@@ -1080,6 +1103,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
             individual_binary_mask = np.zeros(binary_mask.shape)
 
 
+        if visu and len(locations)>0: show_volslice_with_locations(binary_mask, locations)
+
         extra_locations = []
         extra_labels = []
 
@@ -1111,6 +1136,14 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                 from scipy.ndimage import morphology
                 diff = morphology.binary_erosion(diff).astype(diff.dtype)
 
+
+            if visu and len(locations) > 0:
+                print(' == extra locs from components == ')
+                print('original residual.')
+                show_volslice_with_locations(diff, locations)
+                show_volslice_with_locations(individual_binary_mask, locations)
+                show_volslice_with_locations(binary_mask, locations)
+
             ccomponents, cc_labels = filtered_connected_components(diff, locations, labels, idv_mask_list)
 
             if not ccomponents:
@@ -1126,6 +1159,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
             extra_locations = np.array(extra_locations)
             print(' {} extra locations from connected components. '.format(len(extra_locations)))
 
+
+            if visu: show_volslice_with_locations(binary_mask, extra_locations)
 
             extra_masks, extra_locs, extra_refinement, extra_convergence = extra_locations_refinement(extra_locations, 
                                                                                                       locations,
@@ -1152,6 +1187,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
             num_locations_list.append(len(locations))
 
+            if visu: show_volslice_with_locations(binary_mask, locations)
+
 
 
 
@@ -1177,6 +1214,9 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
             extra_locations = np.array(extra_locations)
 
+            if visu and len(extra_locations)>0: 
+                show_volslice_with_locations(binary_mask, extra_locations)
+
             extra_masks, extra_locs, extra_refinement, extra_convergence = extra_locations_refinement(extra_locations, 
                                                                                                       locations,
                                                                                                       extra_labels, 
@@ -1197,6 +1237,8 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                             locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
                                                                                 sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                                                                     model_file_id_thor, model_file_id_lum)            
+
+            if visu: show_volslice_with_locations(binary_mask, locations)
 
         # ------------------------- 3. missing locations from fishing -----------------------------------
 
@@ -1222,6 +1264,10 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
             extra_locations = np.array(extra_locations)
 
+            if visu and len(extra_locations)>0: 
+                print('extra_locs: ', extra_locations)
+                show_volslice_with_locations(binary_mask, extra_locations)
+
             extra_masks, extra_locs, extra_refinement, extra_convergence = extra_locations_refinement(extra_locations, 
                                                                                                       locations,
                                                                                                       extra_labels, 
@@ -1243,6 +1289,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                             locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
                                                                                 sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                                                                     model_file_id_thor, model_file_id_lum)            
+            if visu: show_volslice_with_locations(binary_mask, locations)
 
         #### fishing up 
         fish_up_counter = 0
@@ -1267,6 +1314,11 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
 
             extra_locations = np.array(extra_locations)
 
+
+            if visu and len(extra_locations)>0: 
+                print('extra_locs: ', extra_locations)
+                show_volslice_with_locations(binary_mask, extra_locations)
+
             extra_masks, extra_locs, extra_refinement, extra_convergence = extra_locations_refinement(extra_locations, 
                                                                                                       locations,
                                                                                                       extra_labels, 
@@ -1288,7 +1340,7 @@ def consistency_refinement_close_loop(locations, pir_img, binary_mask,
                                                                             locations, idv_mask_list, loc_needs_refinement, loc_has_converged,
                                                                                 sliding_mask, binary_mask, model_file_id_group, model_file_id_cer,
                                                                                     model_file_id_thor, model_file_id_lum)            
-
+            if visu: show_volslice_with_locations(binary_mask, locations)
         # ------------------------------------------------------------------------------------------------
 
     multi_label_mask = aggregate_multi_label_segmentation(idv_mask_list, labels)
