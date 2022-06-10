@@ -158,7 +158,7 @@ def reorienting(img, start_orient_code, end_orient_code):
     return nib.orientations.apply_orientation(img, trans)
 
 
-def read_isotropic_pir_img_from_nifti_file(file):
+def read_isotropic_pir_img_from_nifti_file(file, itm_orient='PIR'): 
     import nibabel as nib 
 
     _, spacing, orientation_code, _ = get_size_and_spacing_and_orientation_from_nifti_file(file)
@@ -169,16 +169,16 @@ def read_isotropic_pir_img_from_nifti_file(file):
 
     resampled_img = resampled_nifti_img.get_fdata()
 
-    transformed_img = reorienting(resampled_img, orientation_code, 'PIR')
+    transformed_img = reorienting(resampled_img, orientation_code, itm_orient)
 
     return transformed_img
 
 
-def reorient_resample_back_to_original(img, ori_orient_code, spacing, ori_size, ori_aff):
+def reorient_resample_back_to_original(img, ori_orient_code, spacing, ori_size, ori_aff, itm_orient='PIR'):
     import nibabel as nib 
     import numpy as np 
 
-    transformed_img = reorienting(img, 'PIR', ori_orient_code)
+    transformed_img = reorienting(img, itm_orient, ori_orient_code)
 
     nifti_img = nib.Nifti1Image(transformed_img, ori_aff)
 
@@ -254,3 +254,5 @@ def write_result_to_file(pir_mask, ori_orient_code, spacing, ori_size, ori_aff, 
     mask = reorient_resample_back_to_original(pir_mask, ori_orient_code, spacing, ori_size, ori_aff)
 
     save_to_nifti_file(mask, os.path.join(save_dir, '{}_seg.nii.gz'.format(filename)), ori_aff)
+
+
