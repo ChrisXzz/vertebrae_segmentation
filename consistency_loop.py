@@ -981,6 +981,27 @@ def extra_mask_valid(new_loc, extra_mask, locations, mask_list):
     return True
 
 
+
+def clean_predictions_in_sacrum(idv_msk_list, labels):
+    import numpy as np
+
+    if isinstance(labels, list):
+        labels = np.array(labels)
+
+    # when there is T13, check the second largest label
+    if labels.max() == 28:
+        max_label_idx = np.where(labels == np.sort(labels)[-2])[0][0]
+    else:
+        max_label_idx = np.where(labels == np.sort(labels)[-1])[0][0]
+
+    if max_label_idx != (len(labels)-1):
+        idv_msk_list = [idv_msk_list[l] for l in range(max_label_idx+1)]
+        labels = [labels[l] for l in range(max_label_idx+1)]
+
+    return idv_msk_list, labels 
+
+
+
 def aggregate_multi_label_segmentation(idv_msk_list, labels):
     import numpy as np 
 
@@ -989,6 +1010,7 @@ def aggregate_multi_label_segmentation(idv_msk_list, labels):
 
     assert len(idv_msk_list) == len(labels)
 
+    idv_msk_list, labels = clean_predictions_in_sacrum(idv_msk_list, labels)
 
     for label, mask in zip(labels, idv_msk_list):
         multi_label_mask[mask == 1] = label
