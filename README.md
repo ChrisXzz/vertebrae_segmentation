@@ -2,7 +2,7 @@
 
 This is the associated repository of the work 
 
-**Vertebrae segmentation, identification and localization using a graph optimization and a synergistic cycle, 2021.**
+**Vertebrae localization, segmentation and identification using a graph optimization and an anatomic consistency cycle, 2022.**
 
 Pre-print: [http://arxiv.org/abs/2110.12177](http://arxiv.org/abs/2110.12177).
 
@@ -142,7 +142,7 @@ For any questions about the paper and repository, please contact [Di Meng](mailt
 
 If you use the released models or code, please cite both
 
-1. **Meng D et al.,Vertebrae segmentation, identification and localization using a graph optimization and an anatomic consistency cycle, 2022.** [http://arxiv.org/abs/2110.12177](http://arxiv.org/abs/2110.12177)
+1. **Meng D et al.,Vertebrae localization, segmentation and identification using a graph optimization and an anatomic consistency cycle, 2022.** [http://arxiv.org/abs/2110.12177](http://arxiv.org/abs/2110.12177)
 2. **Sekuboyina A et al., VerSe: A Vertebrae Labelling and Segmentation Benchmark for Multi-detector CT Images, 2021.** [https://doi.org/10.1016/j.media.2021.102166](https://doi.org/10.1016/j.media.2021.102166)
 
 
