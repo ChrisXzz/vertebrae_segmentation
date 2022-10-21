@@ -1,0 +1,265 @@
+---
+title: "Vertebra_stats"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Data
+
+
+```{r load}
+mydata = read.csv("vertebrae_shape_statistics.csv",
+                  na.strings=c("","NA"))
+
+
+cervical_data <- mydata[ which(mydata$group.label == 1), ]
+thoracic_data <- mydata[ which(mydata$group.label == 2), ]
+lumbar_data <- mydata[ which(mydata$group.label == 3), ]
+
+mydata_train <- mydata[ which(mydata$dataset == 'train'), ]
+
+cervical_data_train <- mydata_train[ which(mydata$group.label == 1), ]
+thoracic_data_train <- mydata_train[ which(mydata$group.label == 2), ]
+lumbar_data_train <- mydata_train[ which(mydata$group.label == 3), ]
+```
+
+
+``` {r}
+
+library(lmvar)
+
+pre_next.fit <- lm(next.gap ~ gap, data=mydata, x = TRUE, y = TRUE)
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+
+print(cv, digits = 2)
+
+#summary(pre_next.fit)
+
+```
+
+
+```{r Next Gap Generic}
+pre_next.fit <- lm(next.gap ~ gap, data=mydata_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(next.gap ~ gap, data=mydata, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r Next Gap Cervical}
+pre_next.fit <- lm(next.gap ~ gap, data=cervical_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(next.gap ~ gap, data=cervical_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r Next Gap Thoracic}
+pre_next.fit <- lm(next.gap ~ gap, data=thoracic_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(next.gap ~ gap, data=thoracic_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r Next Gap Lumbar}
+pre_next.fit <- lm(next.gap ~ gap, data=lumbar_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(next.gap ~ gap, data=lumbar_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r Prev Gap Generic}
+pre_next.fit <- lm(gap ~ next.gap, data=mydata_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap, data=mydata, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r Prev Gap Cervical}
+pre_next.fit <- lm(gap ~ next.gap, data=cervical_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap, data=cervical_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r Prev Gap Thoracic}
+pre_next.fit <- lm(gap ~ next.gap, data=thoracic_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap, data=thoracic_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r Prev Gap Lumbar}
+pre_next.fit <- lm(gap ~ next.gap, data=lumbar_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap, data=lumbar_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Gap from prev and next Generic}
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=mydata_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=mydata, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Gap from prev and next Cervical}
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=cervical_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=cervical_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Gap from prev and next Thoracic}
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=thoracic_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=thoracic_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Gap from prev and next Lumbar}
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=lumbar_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(gap ~ next.gap + pre.gap, data=lumbar_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Size from prev size Generic}
+pre_next.fit <- lm(size ~ size.of.pre, data=mydata_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.pre, data=mydata, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Size from prev size Cervical}
+pre_next.fit <- lm(size ~ size.of.pre, data=cervical_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.pre, data=cervical_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+```{r  Size from prev size Thoracic}
+pre_next.fit <- lm(size ~ size.of.pre, data=thoracic_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.pre, data=thoracic_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Size from prev size Lumbar}
+pre_next.fit <- lm(size ~ size.of.pre, data=lumbar_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.pre, data=lumbar_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+
+```{r  Size from next size Generic}
+pre_next.fit <- lm(size ~ size.of.next, data=mydata_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.next, data=mydata, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+
+```{r  Size from next size Cervical}
+pre_next.fit <- lm(size ~ size.of.next, data=cervical_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.next, data=cervical_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Size from next size Thoracic}
+pre_next.fit <- lm(size ~ size.of.next, data=thoracic_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.next, data=thoracic_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+```{r  Size from next size Lumbar}
+pre_next.fit <- lm(size ~ size.of.next, data=lumbar_data_train, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+pre_next.fit <- lm(size ~ size.of.next, data=lumbar_data, x = TRUE, y = TRUE)
+summary(pre_next.fit)
+
+cv = cv.lm(pre_next.fit, k= 20, seed=0)
+print(cv, digits = 2)
+```
+
+

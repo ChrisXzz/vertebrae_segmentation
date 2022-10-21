@@ -1,7 +1,7 @@
 
 def get_cubes(img, msk, cube_size, stride, norm=False):
     import numpy as np 
-    from .utils import globalNormalization
+    from utils import globalNormalization
 
     if min(img.shape) < cube_size:
         img = vol_padding(img, cube_size, pad_value=-1000)
@@ -63,7 +63,7 @@ def vol_padding(vol, cube_size, pad_value=-1000):   # pad CT with -1000 (HU of a
 
 def get_roi_cubes(img, msk, cube_size, stride, norm=False):
     import numpy as np 
-    from .utils import globalNormalization
+    from utils import globalNormalization
 
     h, w, c = img.shape
 
@@ -221,10 +221,10 @@ def rotate_img(img, angle):
 
 def read_image_and_mask(ID, dataset_dir, pir_orientation):
     import glob, os
-    from .utils import read_nifti_file ,read_isotropic_pir_img_from_nifti_file
+    from utils import read_nifti_file, read_isotropic_pir_img_from_nifti_file
 
     # read the image and mask 
-    vol_files = glob.glob(os.path.join(dataset_dir, '{}_*.nii.gz').format(ID))
+    vol_files = glob.glob(os.path.join(dataset_dir, ID, '{}_*.nii.gz').format(ID))
 
     for file in vol_files:
         if '_seg' in file:
@@ -243,11 +243,11 @@ def read_image_and_mask(ID, dataset_dir, pir_orientation):
 
 def read_annotation(ID, dataset_dir):
     import glob, os
-    from .utils import read_json_file
+    from utils import read_json_file
     import numpy as np 
 
     # read the labels and locations
-    anno_file = glob.glob(os.path.join(dataset_dir, '{}_*.json').format(ID))[0]
+    anno_file = glob.glob(os.path.join(dataset_dir, ID, '{}_*.json').format(ID))[0]
     anno = read_json_file(anno_file)
 
     locs = []
@@ -277,7 +277,7 @@ def generate_idv_segmentor_paired_cubes_per_ID(ID, dataset_dir, save_folder):
     from scipy import ndimage
     import random 
     import math
-    from .utils import save_to_nifti_file
+    from utils import save_to_nifti_file
 
 
     img_save_dir = os.path.join(save_folder, 'img')
@@ -389,7 +389,7 @@ def generate_classifier_msk_cubes_with_neighbors_per_ID(ID, dataset_dir, save_di
     import os, math 
     import numpy as np 
     from scipy import ndimage
-    from .utils import save_to_nifti_file
+    from utils import save_to_nifti_file
 
 
     print(' ... processing ID: ', ID)
@@ -481,7 +481,7 @@ def generate_classifier_msk_cubes_with_neighbors_per_ID(ID, dataset_dir, save_di
 
 def generate_spine_segmentor_paired_cubes_per_ID(ID, dataset_dir, save_dir):
     
-    from .utils import save_to_nifti_file
+    from utils import save_to_nifti_file
     import os
     from scipy import ndimage
     import numpy as np 
